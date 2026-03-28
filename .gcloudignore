@@ -1,0 +1,14 @@
+# Exclude large/generated directories from Cloud Build upload
+node_modules/
+.next/
+.git/
+.env*
+*.log
+.DS_Store
+
+# Test files
+test_doc.jpg
+test_gov_form.pdf
+test_api.js
+test_models.txt
+output.txt

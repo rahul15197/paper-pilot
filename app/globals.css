@@ -2,7 +2,7 @@
    PaperPilot — Design System & Global Styles
    ============================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
 
 /* ---- Design Tokens ---- */
 :root {
@@ -55,8 +55,8 @@
   --shadow-glow-purple: 0 0 20px rgba(139, 92, 246, 0.3), 0 0 60px rgba(139, 92, 246, 0.1);
 
   /* Typography */
-  --font-primary: 'Outfit', system-ui, -apple-system, sans-serif;
-  --font-secondary: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-primary: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+  --font-secondary: var(--font-inter), system-ui, -apple-system, sans-serif;
 
   /* Spacing */
   --space-xs: 0.25rem;
@@ -252,16 +252,89 @@ body::before {
 
 .hero-section {
   text-align: center;
-  padding: var(--space-2xl) 0 var(--space-lg);
+  padding: var(--space-xl) 0 var(--space-lg);
   animation: fadeInUp 0.6s ease-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.hero-title {
+.hero-animation-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 180px;
+  margin-bottom: var(--space-lg);
+  perspective: 800px;
+}
+
+.hero-folding-scene {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.hero-paper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -60px;
+  margin-left: -60px;
+  font-size: 5rem;
+  filter: drop-shadow(0 10px 20px rgba(6, 182, 212, 0.4));
+  animation: paper-appear-fold 5s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.hero-plane {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -60px;
+  margin-left: -60px;
+  font-size: 5rem;
+  filter: drop-shadow(0 10px 20px rgba(249, 115, 22, 0.4));
+  animation: plane-fly-away 5s ease-in-out infinite;
+  will-change: transform, opacity;
+  opacity: 0;
+}
+
+.hero-brand-name {
   font-family: var(--font-primary);
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  font-weight: 800;
+  font-size: 4.5rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-xs);
+  background: var(--gradient-analyze);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% auto;
+  animation: loading-gradient-pan 5s linear infinite;
+}
+
+.hero-tagline {
+  font-family: var(--font-primary);
+  font-size: 2.25rem;
+  font-weight: 700;
   line-height: 1.2;
+  letter-spacing: -0.01em;
   margin-bottom: var(--space-md);
+  color: var(--color-text-primary);
+  opacity: 0.9;
 }
 
 .hero-title-gradient {
@@ -272,13 +345,45 @@ body::before {
 }
 
 .hero-subtitle {
-  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  font-size: 1.25rem;
   color: var(--color-text-secondary);
-  max-width: 600px;
-  margin: 0 auto;
-  line-height: 1.7;
+  max-width: 850px;
+  margin: 0 auto var(--space-lg);
+  line-height: 1.5;
 }
 
+.hero-scroll-btn {
+  background: rgba(249, 115, 22, 0.1);
+  border: 1px solid rgba(249, 115, 22, 0.4);
+  color: var(--color-accent-orange-light);
+  padding: 8px 24px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-scroll-btn:hover {
+  background: rgba(249, 115, 22, 0.2);
+  border-color: var(--color-accent-orange-light);
+  transform: translateY(2px);
+  box-shadow: 0 0 15px rgba(249, 115, 22, 0.2);
+}
+
+@keyframes subtle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+.hero-scroll-btn span[aria-hidden="true"] {
+  display: inline-block;
+  animation: subtle-bounce 2s infinite ease-in-out;
+}
 /* ============================================
    Upload Zone
    ============================================ */
@@ -299,6 +404,7 @@ body::before {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   overflow: hidden;
+  animation: breathe-border 4s ease-in-out infinite;
 }
 
 .upload-zone:hover,
@@ -313,6 +419,7 @@ body::before {
   border-color: var(--color-accent-success);
   border-style: solid;
   padding: var(--space-lg);
+  animation: none;
 }
 
 .upload-icon {
@@ -414,7 +521,7 @@ body::before {
   color: var(--color-text-primary);
   font-family: var(--font-secondary);
   font-size: 1rem;
-  transition: all var(--transition-base);
+  transition: all var(--transition-base), box-shadow 0.3s ease;
   outline: none;
   min-height: 52px;
 }
@@ -428,23 +535,31 @@ body::before {
   box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
 }
 
-/* Voice Button */
 .voice-btn {
-  width: 52px;
-  height: 52px;
-  min-width: 52px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
   background: var(--color-bg-glass);
-  color: var(--color-text-secondary);
-  font-size: 1.3rem;
-  cursor: pointer;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  padding: 0 var(--space-md);
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-sm);
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.voice-icon {
+  font-size: 1.2rem;
+}
+
+.voice-btn-text {
+  font-size: 0.95rem;
 }
 
 .voice-btn:hover {
@@ -480,6 +595,24 @@ body::before {
 .voice-btn:hover .voice-btn-tooltip {
   opacity: 1;
 }
+
+@keyframes paper-appear-fold {
+  0% { opacity: 0; transform: scale(0.5) rotateY(0deg) translateY(20px); }
+  15% { opacity: 1; transform: scale(1) rotateY(0deg) translateY(0); }
+  25% { opacity: 1; transform: scale(1) rotateY(0deg) translateY(0); }
+  35% { opacity: 1; transform: scale(0.6) rotateY(90deg) translateY(0); }
+  35.01%, 100% { opacity: 0; transform: scale(0.6) rotateY(90deg); }
+}
+
+@keyframes plane-fly-away {
+  0%, 35% { opacity: 0; transform: scale(0.6) rotateY(-90deg) translate(0, 0); }
+  35.01% { opacity: 1; transform: scale(0.6) rotateY(-90deg) translate(0, 0); }
+  45% { opacity: 1; transform: scale(1) rotateY(0deg) translate(0, -10px); }
+  55% { opacity: 1; transform: scale(1) rotateY(0deg) translate(0, -10px) rotateZ(-5deg); }
+  75% { opacity: 0; transform: scale(1.5) translate(200px, -200px) rotateZ(15deg); }
+  100% { opacity: 0; transform: translate(200px, -200px); }
+}
+
 
 /* ============================================
    Analyze Button
@@ -526,6 +659,9 @@ body::before {
 
 .analyze-btn.loading {
   pointer-events: none;
+  background-image: linear-gradient(-45deg, #06b6d4 0%, #8b5cf6 33%, #10b981 66%, #f97316 100%);
+  background-size: 300% 300%;
+  animation: loading-gradient-pan 2s infinite ease-in-out;
 }
 
 .analyze-btn .btn-shimmer {
@@ -695,12 +831,15 @@ body::before {
   border-radius: var(--radius-md);
   background: var(--color-bg-glass);
   border: 1px solid var(--color-border);
-  transition: all var(--transition-fast);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, background 0.2s ease, border-color 0.2s ease;
+  will-change: transform;
 }
 
 .action-item:hover {
   border-color: var(--color-border-hover);
   background: var(--color-bg-glass-hover);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.15);
 }
 
 .action-item.urgent {
@@ -760,6 +899,14 @@ body::before {
   display: flex;
   align-items: flex-start;
   gap: var(--space-md);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.2s ease;
+  will-change: transform;
+}
+
+.deadline-item:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+  border-color: var(--color-accent-orange-light);
 }
 
 .deadline-icon {
@@ -804,6 +951,14 @@ body::before {
   border: 1px solid rgba(239, 68, 68, 0.15);
   font-size: 0.9rem;
   color: var(--color-text-primary);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.2s ease;
+  will-change: transform;
+}
+
+.risk-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
 }
 
 .risk-icon {
@@ -970,6 +1125,66 @@ body::before {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+
+@keyframes breathe-border {
+  0%, 100% { border-color: var(--color-border); box-shadow: none; }
+  50% { border-color: rgba(6, 182, 212, 0.4); box-shadow: 0 0 15px rgba(6, 182, 212, 0.1); }
+}
+
+@keyframes loading-gradient-pan {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes slideUpFade {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.stagger-in {
+  opacity: 0;
+  animation: slideUpFade 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.stagger-delay-1 { animation-delay: 0.1s; }
+.stagger-delay-2 { animation-delay: 0.2s; }
+.stagger-delay-3 { animation-delay: 0.3s; }
+.stagger-delay-4 { animation-delay: 0.4s; }
+.stagger-delay-5 { animation-delay: 0.5s; }
+
+/* ============================================
+   Background Motion Decorations
+   ============================================ */
+
+.bg-decorations {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bg-shape {
+  position: absolute;
+  color: #fff;
+  opacity: 0.03;
+  filter: grayscale(1);
+  will-change: transform;
+  animation: bg-float-up 40s linear infinite;
+}
+
+@keyframes bg-float-up {
+  0% { transform: translateY(110vh) rotate(0deg); }
+  100% { transform: translateY(-30vh) rotate(360deg); }
+}
+
+.bg-shape-1 { left: 10%; font-size: 8rem; animation-duration: 35s; animation-delay: 0s; }
+.bg-shape-2 { left: 30%; font-size: 5rem; animation-duration: 45s; animation-delay: -10s; }
+.bg-shape-3 { left: 55%; font-size: 9rem; animation-duration: 38s; animation-delay: -5s; }
+.bg-shape-4 { left: 75%; font-size: 6rem; animation-duration: 42s; animation-delay: -20s; }
+.bg-shape-5 { left: 85%; font-size: 4rem; animation-duration: 33s; animation-delay: -15s; }
+.bg-shape-6 { left: 20%; font-size: 7rem; animation-duration: 40s; animation-delay: -25s; }
 
 /* ============================================
    Responsive

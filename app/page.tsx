@@ -32,6 +32,17 @@ function buildSpeechText(a: AnalysisResult): string {
   return t;
 }
 
+const BackgroundDecorations = () => (
+  <div className="bg-decorations" aria-hidden="true">
+    <div className="bg-shape bg-shape-1">📄</div>
+    <div className="bg-shape bg-shape-2">✈️</div>
+    <div className="bg-shape bg-shape-3">🧾</div>
+    <div className="bg-shape bg-shape-4">📝</div>
+    <div className="bg-shape bg-shape-5">✈️</div>
+    <div className="bg-shape bg-shape-6">📃</div>
+  </div>
+);
+
 export default function Home() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -46,21 +57,48 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const SR = window.SpeechRecognition || (window as unknown as { webkitSpeechRecognition?: typeof window.SpeechRecognition }).webkitSpeechRecognition;
-    setVoiceSupported(!!SR && !!window.speechSynthesis);
+    // Robust detection for Web Speech API with prefix checks
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const synth = window.speechSynthesis;
+    
+    // In production/cloud, SpeechRecognition requires HTTPS.
+    // Chrome also requires a gesture, but we can check if the API exists first.
+    const supported = !!SR && !!synth;
+    setVoiceSupported(supported);
+    
+    if (!SR) {
+      console.warn("PaperPilot: SpeechRecognition API not detected or blocked by environment.");
+    }
   }, []);
 
   const handleFile = useCallback((file: File) => {
-    if (!file.type.startsWith('image/')) { setError('Please upload a JPG, PNG, or WebP image.'); return; }
-    if (file.size > 10 * 1024 * 1024) { setError('Image too large. Use an image under 10MB.'); return; }
-    setImageFile(file); setAnalysis(null); setError(null);
-    const reader = new FileReader();
-    reader.onload = (e) => setImagePreview(e.target?.result as string);
-    reader.readAsDataURL(file);
+    const isImage = file.type.startsWith('image/');
+    const isPdf = file.type === 'application/pdf';
+    
+    if (!isImage && !isPdf) { 
+      setError('Please upload an image (JPG, PNG, WebP) or a PDF document.'); 
+      return; 
+    }
+    if (file.size > 10 * 1024 * 1024) { 
+      setError('Document too large. Please use a file under 10MB.'); 
+      return; 
+    }
+    setImageFile(file); 
+    setAnalysis(null); 
+    setError(null);
+    
+    if (isImage) {
+      const reader = new FileReader();
+      reader.onload = (e) => setImagePreview(e.target?.result as string);
+      reader.readAsDataURL(file);
+    } else if (isPdf) {
+      // Use a generic placeholder token for PDF
+      setImagePreview('PDF_DOCUMENT_PREVIEW');
+    }
   }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -76,7 +114,7 @@ export default function Home() {
     const rec = new SR();
     rec.lang = 'en-IN'; rec.interimResults = true; rec.continuous = false;
     rec.onstart = () => setIsRecording(true);
-    rec.onresult = (e: SpeechRecognitionEvent) => { const t = Array.from(e.results).map(r => r[0].transcript).join(''); setQuestion(t); };
+    rec.onresult = (e: any) => { const t = Array.from(e.results).map((r: any) => r[0].transcript).join(''); setQuestion(t); };
     rec.onend = () => setIsRecording(false);
     rec.onerror = () => setIsRecording(false);
     recognitionRef.current = rec;
@@ -86,6 +124,8 @@ export default function Home() {
   const handleAnalyze = async () => {
     if (!imageFile) { setError('Please upload a document image first.'); return; }
     setIsLoading(true); setError(null); setAnalysis(null);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 60000); // 60s timeout
     try {
       const base64 = await new Promise<string>((resolve, reject) => {
         const r = new FileReader();
@@ -97,13 +137,25 @@ export default function Home() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: base64, mimeType: imageFile.type, question: question.trim() }),
+        signal: controller.signal,
       });
+      clearTimeout(timeout);
       const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || 'Analysis failed. Please try again.');
+      if (res.status === 429) {
+        throw new Error('⏳ AI quota limit reached. Please wait 1–2 minutes, then try again.');
+      }
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Analysis failed. Please try again.');
+      }
       setAnalysis(data.analysis);
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      clearTimeout(timeout);
+      if (err instanceof Error && err.name === 'AbortError') {
+        setError('⏱️ Request timed out. The AI took too long to respond. Please try again.');
+      } else {
+        setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -134,6 +186,7 @@ export default function Home() {
 
   return (
     <div className="app-container">
+      <BackgroundDecorations />
       <a href="#main-content" className="skip-link">Skip to main content</a>
 
       <header className="app-header" role="banner">
@@ -153,14 +206,29 @@ export default function Home() {
 
         {!analysis && (
           <section className="hero-section" aria-labelledby="hero-title">
-            <h1 id="hero-title" className="hero-title">
+            <div className="hero-animation-container" aria-hidden="true">
+              <div className="hero-folding-scene">
+                <div className="hero-paper">📄</div>
+                <div className="hero-plane">✈️</div>
+              </div>
+            </div>
+            <h1 id="hero-title" className="hero-brand-name">PaperPilot</h1>
+            <h2 className="hero-tagline">
               <span className="hero-title-gradient">Understand Any Document</span>
               <br />in Seconds
-            </h1>
+            </h2>
             <p className="hero-subtitle">
-              Photograph any confusing notice, tax bill, legal letter, or form.
-              Ask a question — or let AI explain everything. Works by voice too.
+              Instantly decode complex legal notices, financial statements, and official forms. 
+              PaperPilot transforms confusing documents into clear, actionable insights. 
+              Works with Voice too.
             </p>
+            <button 
+              className="hero-scroll-btn stagger-in" 
+              onClick={() => document.getElementById('analyze-button')?.scrollIntoView({ behavior: 'smooth' })}
+              aria-label="Scroll down to begin document analysis"
+            >
+              Get Started <span aria-hidden="true">↓</span>
+            </button>
           </section>
         )}
 
@@ -180,24 +248,32 @@ export default function Home() {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/jpeg,image/png,image/webp,image/heic"
+              accept="image/jpeg,image/png,image/webp,image/heic,application/pdf"
               className="upload-input"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
-              aria-label="Upload document image"
+              aria-label="Upload document image or PDF"
               id="document-upload"
             />
             {imagePreview ? (
               <div className="upload-preview-container">
-                <img src={imagePreview} alt="Preview of uploaded document" className="upload-preview" />
-                <button className="upload-change-btn" onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }} aria-label="Change document image">
-                  Change Image
+                {imagePreview === 'PDF_DOCUMENT_PREVIEW' ? (
+                  <div className="upload-preview" style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'var(--color-bg-glass)',border:'1px solid var(--color-border)'}}>
+                    <span style={{fontSize:'3rem',marginBottom:'1rem'}} aria-hidden="true">📑</span>
+                    <span style={{fontFamily:'var(--font-primary)',fontWeight:600}}>{imageFile?.name}</span>
+                    <span style={{fontSize:'0.85rem',color:'var(--color-text-muted)',marginTop:'0.25rem'}}>PDF Document</span>
+                  </div>
+                ) : (
+                  <img src={imagePreview} alt="Preview of uploaded document" className="upload-preview" />
+                )}
+                <button className="upload-change-btn" onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }} aria-label="Change document file">
+                  Change File
                 </button>
               </div>
             ) : (
               <>
                 <span className="upload-icon" aria-hidden="true">📄</span>
                 <p className="upload-title">Drop your document here</p>
-                <p className="upload-subtitle">or click to browse · JPG, PNG, WebP up to 10MB</p>
+                <p className="upload-subtitle">or click to browse · PDF, JPG, PNG, WebP up to 10MB</p>
               </>
             )}
           </div>
@@ -230,8 +306,10 @@ export default function Home() {
                   aria-label={isRecording ? 'Stop voice recording' : 'Ask using your voice'}
                   aria-pressed={isRecording}
                   title={isRecording ? 'Tap to stop' : 'Speak your question'}
+                  type="button"
                 >
-                  {isRecording ? '⏹️' : '🎤'}
+                  <span className="voice-icon" aria-hidden="true">{isRecording ? '🛑' : '🗣️'}</span>
+                  <span className="voice-btn-text">{isRecording ? 'Stop Listening' : 'Voice Input'}</span>
                   <span className="voice-btn-tooltip">{isRecording ? 'Tap to stop' : 'Speak your question'}</span>
                 </button>
               )}
@@ -291,13 +369,13 @@ export default function Home() {
               </header>
 
               <div className="results-body">
-                <div className="summary-block" aria-labelledby="summary-label">
+                <div className="summary-block stagger-in stagger-delay-1" aria-labelledby="summary-label">
                   <h3 id="summary-label" className="section-title"><span aria-hidden="true">📋</span> What This Document Means</h3>
                   <p>{analysis.summary}</p>
                 </div>
 
                 {analysis.deadlines.length > 0 && (
-                  <div aria-labelledby="deadlines-label">
+                  <div aria-labelledby="deadlines-label" className="stagger-in stagger-delay-2">
                     <h3 id="deadlines-label" className="section-title"><span aria-hidden="true">📅</span> Important Deadlines</h3>
                     <ul className="deadline-list" style={{listStyle:'none',padding:0}}>
                       {analysis.deadlines.map((d, i) => (
@@ -315,7 +393,7 @@ export default function Home() {
                 )}
 
                 {analysis.actions.length > 0 && (
-                  <div aria-labelledby="actions-label">
+                  <div aria-labelledby="actions-label" className="stagger-in stagger-delay-3">
                     <h3 id="actions-label" className="section-title"><span aria-hidden="true">✅</span> What You Need To Do</h3>
                     <ul className="action-list" style={{listStyle:'none',padding:0}}>
                       {analysis.actions.map((action) => (
@@ -332,7 +410,7 @@ export default function Home() {
                 )}
 
                 {analysis.risks.length > 0 && (
-                  <div aria-labelledby="risks-label">
+                  <div aria-labelledby="risks-label" className="stagger-in stagger-delay-4">
                     <h3 id="risks-label" className="section-title"><span aria-hidden="true">⚠️</span> Important Warnings</h3>
                     <ul className="risk-list" style={{listStyle:'none',padding:0}}>
                       {analysis.risks.map((risk, i) => (
@@ -346,7 +424,7 @@ export default function Home() {
                 )}
 
                 {analysis.contacts.length > 0 && (
-                  <div aria-labelledby="contacts-label">
+                  <div aria-labelledby="contacts-label" className="stagger-in stagger-delay-5">
                     <h3 id="contacts-label" className="section-title"><span aria-hidden="true">📞</span> Who To Contact</h3>
                     <ul className="contact-list" style={{listStyle:'none',padding:0}}>
                       {analysis.contacts.map((c, i) => (
