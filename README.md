@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ✈️ PaperPilot
 
-## Getting Started
+**PaperPilot** is a premium, AI-powered document assistant designed to help everyday people decode and understand complex official documents. Whether it's a confusing government notice, a dense medical report, a legal summons, or a cryptic utility bill, PaperPilot transforms bureaucratic jargon into clear, actionable insights.
 
-First, run the development server:
+![PaperPilot Interface](public/mockup.png)
 
+## 🌟 Key Features
+
+-   **Multi-Format Analysis:** Upload PDFs or images (JPG, PNG, WebP, HEIC) up to 10MB.
+-   **Smart Summaries:** Get 2-3 sentence "plain English" explanations of any document.
+-   **Structured Navigation:**
+    -   **📅 Deadlines:** Automated extraction of dates, requirements, and consequences.
+    -   **✅ Action Items:** Clear, numbered steps on what you need to do next.
+    -   **⚠️ Risks & Warnings:** Plain-language alerts about penalties or important considerations.
+    -   **📞 Contacts:** Identifies relevant offices, roles, phone numbers, and websites.
+-   **Voice-First Interaction:**
+    -   **🗣️ Voice Input:** Ask specific questions about your document using your voice.
+    -   **🔊 Read Aloud:** Listen to the analysis results (perfect for accessibility).
+-   **Hyper-Reliable AI:** Powered by Google Gemini with a built-in **Multi-Model Fallback Chain** (`2.0-flash` → `1.5-flash-8b` → `1.5-flash`) and exponential backoff to ensure high availability even during peak traffic.
+-   **Premium UI/UX:** Built with a modern aesthetic featuring glassmorphism, staggered entrance animations, and a responsive layout optimized for all devices.
+
+## 🛠️ Tech Stack
+
+-   **Framework:** [Next.js 15+](https://nextjs.org/) (App Router)
+-   **UI Library:** [React 19](https://react.dev/)
+-   **AI Engine:** [Google Gemini AI](https://ai.google.dev/) via `@google/generative-ai`
+-   **Styling:** Vanilla CSS (Modern CSS variables, Flexbox/Grid, Animations)
+-   **Testing:** [Vitest](https://vitest.dev/) & React Testing Library
+-   **Deployment:** Docker-ready, optimized for [GCP Cloud Run](https://cloud.google.com/run)
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+-   Node.js 18.x or later
+-   A Google AI Studio API Key (Get one at [aistudio.google.com](https://aistudio.google.com/))
+
+### 2. Installation
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/your-repo/paper-pilot.git
+cd paper-pilot
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Environment Setup
+Create a `.env.local` file in the root directory:
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 4. Run Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🐳 Deployment (Docker)
 
-## Learn More
+To build and run the production container locally:
+```bash
+docker build -t paper-pilot .
+docker run -p 8080:8080 -e GEMINI_API_KEY=your_key paper-pilot
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 🧪 Testing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Run the suite of unit and integration tests:
+```bash
+npm test
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+*Disclaimer: PaperPilot is for informational purposes only. Always consult with a qualified professional for legal, financial, or medical advice.*
