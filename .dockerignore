@@ -1,0 +1,8 @@
+.next/
+node_modules/
+.env*
+*.log
+.DS_Store
+test_doc.jpg
+test_gov_form.pdf
+test_api.js
