@@ -31,30 +31,12 @@
 -   **Testing:** [Vitest](https://vitest.dev/) & React Testing Library
 -   **Deployment:** Docker-ready, optimized for [GCP Cloud Run](https://cloud.google.com/run)
 
-## 🚀 Getting Started
+## 🌐 Live Access
 
-### 1. Prerequisites
--   Node.js 18.x or later
--   A Google AI Studio API Key (Get one at [aistudio.google.com](https://aistudio.google.com/))
+**PaperPilot** is live and accessible as part of my portfolio.
 
-### 2. Installation
-```bash
-git clone https://github.com/your-repo/paper-pilot.git
-cd paper-pilot
-npm install
-```
-
-### 3. Environment Setup
-Create a `.env.local` file in the root directory:
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-```
-
-### 4. Run Development Server
-```bash
-npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) to see the app.
+-   🔗 **Website:** [rahulmaheshwari.dev](https://rahulmaheshwari.dev)
+-   📱 **How to access:** Open the **Apps** dropdown menu in the navigation bar and select **PaperPilot**.
 
 ## 🐳 Deployment (Docker)
 
