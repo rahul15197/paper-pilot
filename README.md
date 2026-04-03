@@ -33,25 +33,10 @@
 
 ## 🌐 Live Access
 
-**PaperPilot** is live and accessible as part of my portfolio.
+**PaperPilot** is live and accessible.
 
 -   🔗 **Website:** [rahulmaheshwari.dev](https://rahulmaheshwari.dev)
 -   📱 **How to access:** Open the **Apps** dropdown menu in the navigation bar and select **PaperPilot**.
-
-## 🐳 Deployment (Docker)
-
-To build and run the production container locally:
-```bash
-docker build -t paper-pilot .
-docker run -p 8080:8080 -e GEMINI_API_KEY=your_key paper-pilot
-```
-
-## 🧪 Testing
-
-Run the suite of unit and integration tests:
-```bash
-npm test
-```
 
 ---
 
