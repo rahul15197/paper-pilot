@@ -1,8 +1,27 @@
+# Exclude build artifacts and dependencies
 .next/
 node_modules/
+
+# Exclude sensitive files
 .env*
+.git/
+*.pem
+
+# Exclude logs
 *.log
+
+# Exclude OS files
 .DS_Store
+
+# Exclude test/dev files
 test_doc.jpg
 test_gov_form.pdf
 test_api.js
+test_models.txt
+output.txt
+deploy_log*.txt
+
+# Exclude docs
+CLAUDE.md
+AGENTS.md
+README.md

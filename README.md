@@ -2,7 +2,7 @@
 
 **PaperPilot** is a premium, AI-powered document assistant designed to help everyday people decode and understand complex official documents. Whether it's a confusing government notice, a dense medical report, a legal summons, or a cryptic utility bill, PaperPilot transforms bureaucratic jargon into clear, actionable insights.
 
-![PaperPilot Interface](public/mockup.png)
+![PaperPilot Preview](public/preview.png)
 
 ## 🌟 Key Features
 
@@ -13,11 +13,14 @@
     -   **✅ Action Items:** Clear, numbered steps on what you need to do next.
     -   **⚠️ Risks & Warnings:** Plain-language alerts about penalties or important considerations.
     -   **📞 Contacts:** Identifies relevant offices, roles, phone numbers, and websites.
--   **Voice-First Interaction:**
-    -   **🗣️ Voice Input:** Ask specific questions about your document using your voice.
-    -   **🔊 Read Aloud:** Listen to the analysis results (perfect for accessibility).
--   **Hyper-Reliable AI:** Powered by Google Gemini with a built-in **Multi-Model Fallback Chain** (`2.0-flash` → `1.5-flash-8b` → `1.5-flash`) and exponential backoff to ensure high availability even during peak traffic.
--   **Premium UI/UX:** Built with a modern aesthetic featuring glassmorphism, staggered entrance animations, and a responsive layout optimized for all devices.
+-   **Integrated Chat & Voice:**
+    -   **🗣️ Voice Consultation:** Ask follow-up questions about your document using native speech recognition.
+    -   **💬 Interactive Q&A:** Deep-dive into specific clauses or requirements via a smart chat interface.
+-   **Pro Utilities:**
+    -   **🖨️ PDF Export:** Generate branded, professional analysis reports ready for printing or sharing.
+    -   **💾 History & Quotas:** Persistent local history tracking and daily usage management.
+-   **Hyper-Reliable AI:** Powered by Google Gemini with a built-in **Multi-Model Fallback Chain** (`2.0-flash` → `1.5-flash-8b` → `1.5-flash`) for maximum uptime.
+-   **Premium UI/UX:** An immersive, dark-mode-locked aesthetic featuring glassmorphism, 3D floating objects, and fluid staggered animations.
 
 ## 🛠️ Tech Stack
 

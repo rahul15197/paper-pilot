@@ -23,6 +23,10 @@ export const metadata: Metadata = {
     description: "Decode any confusing document with AI. Just photograph it and ask.",
     type: "website",
   },
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
